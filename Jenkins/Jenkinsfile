@@ -3,12 +3,20 @@ pipeline
 agent {
   label 'dockerNode'
 }
+tools {
+  maven 'Maven_3_9'
+}
 stages{
 	
 	stage('build'){
 		steps{
 			sh 'mvn clean package'
 		}
+		post {
+		  success {
+		    archiveArtifacts artifacts: '**/target/*.jar'
+  				}
+			}
 	}
 }
 }

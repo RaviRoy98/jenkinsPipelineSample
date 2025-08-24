@@ -7,8 +7,10 @@ environment {
   name = "Ravi"
 }
 parameters {
-  string defaultValue: 'Roy', name: 'LastName'
+//  string defaultValue: 'Roy', name: 'LastName'
+	choice choices: ['dev', 'prod'], name: 'select_environment'
 }
+
 tools {
   maven 'Maven_3_9'
 }
@@ -16,28 +18,53 @@ stages{
 	
 	stage('build'){
 		steps{
-			sh 'mvn clean package'
-			echo "hello $name ${params.LastName}"
+			sh 'mvn clean package -DskipTests=true'
+//			echo "hello $name ${params.LastName}"
 		}
-		post {
-		  success {
-		    archiveArtifacts artifacts: '**/target/*.jar'
-  				}
-			}
 	}
 	
 	stage('test'){
 		parallel{
 			stage('Test A'){
+				agent { label 'dockerNode' }
 				steps{
 					echo "This is Test1"
+					sh 'mvn test'
 				}
 			}
 			stage('Test B'){
+				agent { label 'dockerNode' }
 				steps{
 					echo "This is Test2"
+					sh 'mvn test'
 				}
 			}
+		}
+		post {
+		  success {
+//		    archiveArtifacts artifacts: '**/target/*.jar'
+			stash name: 'maven-build', includes: 'target/*.jar', allowEmpty: false
+  			}
+			}
+	}
+	
+	stage('deploy-dev'){
+		 when { expression {params.select_environment == 'dev'} beforeAgent true}
+		agent { label 'dockerNode' }
+		steps
+		{
+		unstash 'maven-build'
+		
+		// Confirm file is there
+		sh 'ls -lah target || true'
+		// Option A: check version/help
+		sh 'java -jar target/*.jar --help || true'
+
+	    // Option B: smoke test Spring Boot
+	    sh 'nohup java -jar target/*.jar --spring.profiles.active=dev &'
+	    sh 'sleep 10'
+	    sh 'curl -f http://localhost:8080/actuator/health'
+	    sh 'pkill -f "*.jar" || true'	
 		}
 	}
 }

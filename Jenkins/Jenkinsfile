@@ -7,7 +7,7 @@ environment {
   name = "Ravi"
 }
 parameters {
-  string defaultValue: 'Ravi', name: 'FirstName'
+  string defaultValue: 'Roy', name: 'LastName'
 }
 tools {
   maven 'Maven_3_9'
@@ -17,13 +17,28 @@ stages{
 	stage('build'){
 		steps{
 			sh 'mvn clean package'
-			echo "hello $name ${params.FirstName}"
+			echo "hello $name ${params.LastName}"
 		}
 		post {
 		  success {
 		    archiveArtifacts artifacts: '**/target/*.jar'
   				}
 			}
+	}
+	
+	stage('test'){
+		parallel{
+			stage('Test A'){
+				steps{
+					echo "This is Test1"
+				}
+			}
+			stage('Test B'){
+				steps{
+					echo "This is Test2"
+				}
+			}
+		}
 	}
 }
 }

@@ -49,7 +49,8 @@ stages{
 	}
 	
 	stage('deploy-dev'){
-		when { expression {params.select_environment == 'dev'} beforeAgent true}
+		when { expression {params.select_environment == 'dev'}
+		beforeAgent true}
 		agent { label 'dockerNode' }
 		steps
 		{

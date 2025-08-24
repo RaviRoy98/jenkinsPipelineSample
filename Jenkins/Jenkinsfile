@@ -17,6 +17,7 @@ stages{
 	stage('build'){
 		steps{
 			sh 'mvn clean package'
+			echo "hello $name ${params.FirstName}"
 		}
 		post {
 		  success {

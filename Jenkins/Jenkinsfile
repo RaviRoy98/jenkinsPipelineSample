@@ -3,6 +3,12 @@ pipeline
 agent {
   label 'dockerNode'
 }
+environment {
+  name = "Ravi"
+}
+parameters {
+  string defaultValue: 'Ravi', name: 'FirstName'
+}
 tools {
   maven 'Maven_3_9'
 }
@@ -14,7 +20,7 @@ stages{
 		}
 		post {
 		  success {
-		    archiveArtifacts artifacts: 'target/*.jar'
+		    archiveArtifacts artifacts: '**/target/*.jar'
   				}
 			}
 	}

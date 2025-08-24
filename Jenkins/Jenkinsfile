@@ -24,7 +24,7 @@ stages{
 	}
 	
 	stage('test'){
-		parallel{
+//		parallel{
 			stage('Test A'){
 				agent { label 'dockerNode' }
 				steps{
@@ -39,7 +39,7 @@ stages{
 					sh 'mvn test'
 				}
 			}
-		}
+//		}
 		post {
 		  success {
 //		    archiveArtifacts artifacts: '**/target/*.jar'
